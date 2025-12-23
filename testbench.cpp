@@ -1,0 +1,236 @@
+#include <ncurses.h>
+#include <iostream>
+#include <chrono> 
+#include <cmath> 
+
+using namespace std; 
+
+// clang++ -lncurses -std=c++17 documentation.cpp -o docs
+
+int main() {
+
+
+    //configration mode: 
+    cout << "\033[2J\033[1;1H" << flush;
+
+    cout << "\n\n Welcome to SER Benchmark! ------------------------ Created by Daniel Song" << endl; 
+    cout << "\nThis tool provides an overview of your session efficiency, that being the time spent working versus the time spent taking breaks: " <<endl; 
+    cout << " \n-> SER: Total session efficiency (percentage of time spent studying versus total time elapsed) \n -> Delta: How well you are performing versus your recent session efficiency \n -> EMA SER: Average recent session efficiency (how well you have been studying recently)" << endl;
+    cout << "These statistics are complimented by a visual display of your SER."; 
+    cout << "\n\n Please note: Your SER should not, and will not be equivalent to 100%. Set a benchmark prior to working as a goal (i.e 70%). \n Please note: Your DELTA should not, and will not provide a holistic representation of your success working. Do not treat it as such." << endl; 
+
+    double usernum{}; //user input 
+    while (1) {
+        cout << "\n\nPlease enter a target SER (%): \n Tip: If you aim to work 50 minutes w/ 10 minute breaks in between, your target SER is (50/60 = 83%) " << endl; 
+        cin >> usernum; 
+        if (usernum<=0 || usernum > 100) {
+            cout << "Please input a value between {0, 100}." << endl; 
+        } else {
+            break; 
+        }
+    }
+    
+    //ncurses initialization
+
+    initscr(); //NCURSES BEGIN
+    cbreak(); //now each input does not require enter 
+    noecho(); // does not echo the user's input
+    refresh(); //refreshes the whole screen
+    
+    WINDOW * interface; //window pointer called win     
+    interface = newwin(5, 40, 0, 0); //initalization of a new window 
+    double delta = 0.0; 
+    char deltaSign{}; 
+
+    keypad(interface, TRUE); //activate keypad
+
+    wprintw(interface, "----------------------------------------"); 
+    wmove(interface, 1, 6); 
+    wprintw(interface, "SER BENCHMARK // TARGET %.2f%%", usernum); 
+    wmove(interface, 2, 0); 
+    wprintw(interface, "----------------------------------------"); 
+    wprintw(interface, "[S] Begin Program [X] Quit"); 
+    wrefresh(interface); 
+
+    char userc{}; //initial user input
+    while(userc!='S') {
+        userc = wgetch(interface); 
+        if (userc == 'X') {
+            clear();
+            printw("Goodbye! Press any key to exit."); 
+            getch(); 
+            return 0;
+        }
+    }
+
+    wtimeout(interface, 20); //configuration for non-blocking input 
+
+    /////////////////////////// PROGRAM LOGIC
+
+    WINDOW * data; //window displaying all statistics 
+    data = newwin(10, 40, 6, 0);
+
+    WINDOW *display; //window containing visual display
+    display = newwin(12, 7, 2, 44);
+    wrefresh(display); 
+
+    using clock = std::chrono::steady_clock; 
+    auto startTime = clock::now(); //time of program beginning
+    auto elapsedTime{clock::duration::zero()}; //total elapsed time 
+    auto tempBreakStart{clock::now()}; //temporary break start time
+    auto tempBreakElapsed{clock::duration::zero()}; //temporary elapsed break time 
+    auto totalPassive{clock::duration::zero()}; //total amount of time spent on break
+
+    double target = usernum; //target SER value 
+
+    //colour configuration 
+    start_color(); 
+    use_default_colors();
+    init_pair(2, COLOR_GREEN, -1); // positive 
+    init_pair(1, COLOR_RED,   -1); //negative 
+    
+    userc = 0; 
+    bool mode = 1; //mode 1 = active, 1 = negative 
+    double ser = 100.0; //ser is initially 100
+
+    //animation
+    double flashPeriod = 0.8; //how 'strobe-y' the on and off of the last line is 
+    auto lastFlash = clock::now(); //stores when the last on/off of the last line was 
+    bool flashOn = 1; //stores whether or not the line is currently on or off 
+
+    while(userc!='X') {
+        wclear(interface); 
+        wclear(display); 
+        wclear(data); 
+
+        wprintw(interface, "----------------------------------------"); 
+        wmove(interface, 1, 6); 
+        wprintw(interface, "SER BENCHMARK // TARGET %.2f%%", target); 
+        wmove(interface, 2, 0); 
+        wprintw(interface, "----------------------------------------");
+        wprintw(interface, "[T] Toggle Tracking [X] Stop Session"); 
+        wrefresh(interface); 
+
+        int input = wgetch(interface); 
+        if (input!=ERR) {
+            userc = char(input); 
+            if (userc == 'T') { 
+                if (mode==0) { //if toggled from passive to active 
+                    mode = 1; 
+                    totalPassive += tempBreakElapsed; //add up break time this interval to total passive time 
+                    tempBreakElapsed = clock::duration::zero(); //reset tempBreakElapsed counter 
+                } else {
+                    mode = 0; //if toggled from active to passive 
+                    tempBreakStart = clock::now(); //record the break begin time for this interval 
+                }     
+            } else if (userc == 'X') { //quit 
+                break; 
+            }
+        }
+
+        //display box - highlight red if passive green if active 
+        if (mode) {
+            wattron(display, COLOR_PAIR(2)); 
+            box(display, 0, 0);  
+            wattroff(display, COLOR_PAIR(2)); 
+        } else {
+            wattron(display, COLOR_PAIR(1)); 
+            box(display, 0, 0); 
+            wattroff(display, COLOR_PAIR(1));
+        }
+   
+        //calculate elapsed time 
+        elapsedTime = clock::now() - startTime; 
+        int elapsed_s;
+        elapsed_s = std::chrono::duration_cast<std::chrono::seconds>(elapsedTime).count(); //convert to seconds 
+
+        if (mode == 0) { //if passive mode 
+            tempBreakElapsed = clock::now() - tempBreakStart; //calculate the break time elapsed 
+            wattron(data, COLOR_PAIR(1)); 
+            mvwprintw(data, 0, 0, "Mode PASSIVE"); //print in red 
+            wattroff(data, COLOR_PAIR(1)); 
+        } else {
+            wattron(data, COLOR_PAIR(2)); 
+            mvwprintw(data, 0, 0, "Mode ACTIVE "); //print in green
+            wattroff(data, COLOR_PAIR(2)); 
+        }
+           
+        int tempBreakElapsed_s; //convert to seconds 
+        tempBreakElapsed_s = std::chrono::duration_cast<std::chrono::seconds>(tempBreakElapsed).count();
+        int totalPassive_s;
+        totalPassive_s = std::chrono::duration_cast<std::chrono::seconds>(totalPassive).count();
+
+        if (elapsed_s > 0) { //if time passed is greater than 0 (division by 0 check)
+            ser = (((double)elapsed_s - (double)(tempBreakElapsed_s + totalPassive_s)) / ((double)elapsed_s)); //SER = elapsed time - (total elapsed break time + current break time (if there is any)) / total elapsed time
+        } else ser = 1.00; 
+        
+        //delta calculations
+        delta = (((ser*100)-target))/target * 100; //delta equal the difference between target ser and actual ser 
+
+        //print data 
+        mvwprintw(data, 1, 0, "Elapsed Time: %f", (double)elapsed_s);
+        mvwprintw(data, 2, 0, "SER: %.2f%%", ser*100);
+        int deltaState; 
+        if (delta<0) { 
+            deltaSign = '-'; 
+            deltaState=1; 
+        } else { 
+            deltaState=2; 
+            deltaSign = '+';
+        } 
+        wattron(data, COLOR_PAIR(deltaState)); 
+        mvwprintw(data, 3, 0, "Delta: %c%.2f%%", deltaSign, fabs(delta));
+        wattroff(data, COLOR_PAIR(deltaState)); 
+
+    
+        //display 
+        
+        int level = 10 - int(floor((ser*10))); //convert ser to scale of 10 
+        if (level<1) {level = 1;} 
+
+        for(int j=10; j>level; j--) {
+            mvwprintw(display, j, 1, "-----"); 
+        }
+
+        double interflash = std::chrono::duration<double>(clock::now() - lastFlash).count(); //the time between last flash
+
+        int colourCode = 1; 
+        if (mode) colourCode = 2; 
+        else colourCode = 1; 
+
+        if (interflash>flashPeriod) { //if interval between flash is greater than preset flash period, toggle what you are drawing
+                if (flashOn) {
+                    flashOn = false; 
+                    mvwprintw(display, level, 1, "    "); 
+                    lastFlash = clock::now();
+                } else {
+                    flashOn = true; 
+                    wattron(display, COLOR_PAIR(colourCode)); 
+                    mvwprintw(display, level, 1, "-----"); 
+                    wattroff(display, COLOR_PAIR(colourCode)); 
+                    lastFlash = clock::now(); 
+                }
+            } else { //if interval between flash is not greater, keep drawing what you are drawing 
+                if (flashOn) {
+                    wattron(display, COLOR_PAIR(colourCode)); 
+                    mvwprintw(display, level, 1, "-----"); 
+                    wattroff(display, COLOR_PAIR(colourCode)); 
+                } else {
+                    mvwprintw(display, level, 1, "    ");  
+                }
+            } 
+
+        wrefresh(data); 
+        wrefresh(display); 
+        
+    }
+    
+    clear(); 
+    printw("SESSION CONCLUDED ------------------%%%%%%% \n"); 
+    printw("Concluding SER & Delta: %.2f%% %c%.2f%", ser, deltaSign, delta); 
+    printw("Goodbye! Press any key to exit."); 
+    getch(); 
+    endwin();
+    return 0; 
+}
+
