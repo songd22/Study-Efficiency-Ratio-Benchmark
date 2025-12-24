@@ -2,12 +2,16 @@
 #include <iostream>
 #include <chrono> 
 #include <cmath> 
+#include <fstream>
+#include <iomanip>
+#include <ctime>
 
 using namespace std; 
 
 // clang++ -lncurses -std=c++17 documentation.cpp -o docs
 
 int main() {
+
 
 
     //configration mode: 
@@ -59,7 +63,7 @@ int main() {
             clear();
             printw("Goodbye! Press any key to exit."); 
             getch(); 
-            return 0;
+            return 1;
         }
     }
 
@@ -80,7 +84,6 @@ int main() {
     auto tempBreakStart{clock::now()}; //temporary break start time
     auto tempBreakElapsed{clock::duration::zero()}; //temporary elapsed break time 
     auto totalPassive{clock::duration::zero()}; //total amount of time spent on break
-
     double target = usernum; //target SER value 
 
     //colour configuration 
@@ -108,7 +111,7 @@ int main() {
         wprintw(interface, "SER BENCHMARK // TARGET %.2f%%", target); 
         wmove(interface, 2, 0); 
         wprintw(interface, "----------------------------------------");
-        wprintw(interface, "[T] Toggle Tracking [X] Stop Session"); 
+        wprintw(interface, "[T] Toggle Tracking [X] Complete Session"); 
         wrefresh(interface); 
 
         int input = wgetch(interface); 
@@ -227,7 +230,30 @@ int main() {
     
     clear(); 
     printw("SESSION CONCLUDED ------------------%%%%%%% \n"); 
-    printw("Concluding SER & Delta: %.2f%% %c%.2f%", ser, deltaSign, delta); 
+    printw("Concluding SER & Delta: %.2f%% %c%.2f%", ser, deltaSign, fabs(delta)); 
+    printw("\nRecord in log file? [Y]");
+    userc = getch(); 
+    if (userc =='Y' || userc == 'y') {
+
+        auto now_c = chrono::system_clock::to_time_t(chrono::system_clock::now()); //get current time in seconds
+        int seconds = std::chrono::duration_cast<std::chrono::seconds>(elapsedTime).count(); //total elapsed time in seconds
+        int minutes = seconds/60; 
+        int hours = minutes/60;
+        minutes = minutes%60; 
+        seconds = seconds%60; 
+
+        std::ofstream log("log.txt", std::ios::app);
+        if (!log) {
+            printw("Error in file append. Logs not recorded. Double check integrity of file.");
+        }
+        log << std::put_time(std::localtime(&now_c), "%Y-%m-%d %H:%M")
+        << " | duration: " << hours << "hrs " << minutes << "min " << seconds << "sec"
+        << " | SER: " << ser *100 << "%\n";
+        clear(); 
+        printw("\nWrite success.\n");
+        log.close(); 
+    } else printw("Acknowledged. Logs not recorded."); 
+
     printw("Goodbye! Press any key to exit."); 
     getch(); 
     endwin();
