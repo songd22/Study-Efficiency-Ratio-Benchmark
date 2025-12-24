@@ -5,21 +5,17 @@
 #include <fstream>
 #include <iomanip>
 #include <ctime>
-
 using namespace std; 
 
-// clang++ -lncurses -std=c++17 documentation.cpp -o docs
+const string VERSION = "1.0"; 
 
 int main() {
 
-
-
     //configration mode: 
     cout << "\033[2J\033[1;1H" << flush;
-
-    cout << "\n\n Welcome to SER Benchmark! ------------------------ Created by Daniel Song" << endl; 
+    cout << "\n\n Welcome to SER Benchmark! (Version " << VERSION << ")" << endl; 
     cout << "\nThis tool provides an overview of your session efficiency, that being the time spent working versus the time spent taking breaks: " <<endl; 
-    cout << " \n-> SER: Total session efficiency (percentage of time spent studying versus total time elapsed) \n -> Delta: How well you are performing versus your recent session efficiency" << endl;
+    cout << " \n-> SER: Total session efficiency (percentage of time spent studying versus total time elapsed) \n -> Delta: How well you are performing versus your recent session efficiency \n \n Created by Daniel Song" << endl;
 
     double usernum{}; //user input 
     while (1) {
@@ -55,7 +51,7 @@ int main() {
     wrefresh(interface); 
 
     char userc{}; //initial user input
-    while(userc!='S') {
+    while(userc!='S' && userc!='s') {
         userc = wgetch(interface); 
         if (userc == 'X') {
             clear();
@@ -105,7 +101,7 @@ int main() {
     auto lastFlash = clock::now(); //stores when the last on/off of the last line was 
     bool flashOn = 1; //stores whether or not the line is currently on or off 
 
-    while(userc!='X') {
+    while(userc!='X' && userc!='x') {
         wclear(interface); 
         wclear(display); 
         wclear(data); 
@@ -121,7 +117,7 @@ int main() {
         int input = wgetch(interface); 
         if (input!=ERR) {
             userc = char(input); 
-            if (userc == 'T') { 
+            if (userc == 'T' || userc == 't') { 
                 if (mode==0) { //if toggled from passive to active 
                     mode = 1; 
                     totalPassive += tempBreakElapsed; //add up break time this interval to total passive time 
@@ -171,7 +167,7 @@ int main() {
         int totalPassive_s;
         totalPassive_s = std::chrono::duration_cast<std::chrono::seconds>(totalPassive).count();
 
-        if (seconds > 0) { //if time passed is greater than 0 (division by 0 check)
+        if (elapsed_s > 0) { //if time passed is greater than 0 (division by 0 check)
             ser = (((double)elapsed_s - (double)(tempBreakElapsed_s + totalPassive_s)) / ((double)elapsed_s)); //SER = elapsed time - (total elapsed break time + current break time (if there is any)) / total elapsed time
         } else ser = 1.00; 
         
@@ -238,7 +234,7 @@ int main() {
     
     clear(); 
     printw("SESSION CONCLUDED ------------------%%%%%%% \n"); 
-    printw("Concluding SER & Delta: %.2f%% %c%.2f%", ser, deltaSign, fabs(delta)*100); 
+    printw("Concluding SER & Delta: %.2f%% %c%.2f%", ser*100, deltaSign, fabs(delta)); 
     printw("\nRecord in log file? [Y]");
     userc = getch(); 
     if (userc =='Y' || userc == 'y') {
@@ -260,7 +256,7 @@ int main() {
         clear(); 
         printw("\nWrite success.\n");
         log.close(); 
-    } else printw("Acknowledged. Logs not recorded."); 
+    } else printw("\nAcknowledged. Logs not recorded.\n"); 
 
     printw("Goodbye! Press any key to exit."); 
     getch(); 
