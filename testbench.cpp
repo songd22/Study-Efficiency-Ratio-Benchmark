@@ -19,13 +19,11 @@ int main() {
 
     cout << "\n\n Welcome to SER Benchmark! ------------------------ Created by Daniel Song" << endl; 
     cout << "\nThis tool provides an overview of your session efficiency, that being the time spent working versus the time spent taking breaks: " <<endl; 
-    cout << " \n-> SER: Total session efficiency (percentage of time spent studying versus total time elapsed) \n -> Delta: How well you are performing versus your recent session efficiency \n -> EMA SER: Average recent session efficiency (how well you have been studying recently)" << endl;
-    cout << "These statistics are complimented by a visual display of your SER."; 
-    cout << "\n\n Please note: Your SER should not, and will not be equivalent to 100%. Set a benchmark prior to working as a goal (i.e 70%). \n Please note: Your DELTA should not, and will not provide a holistic representation of your success working. Do not treat it as such." << endl; 
+    cout << " \n-> SER: Total session efficiency (percentage of time spent studying versus total time elapsed) \n -> Delta: How well you are performing versus your recent session efficiency" << endl;
 
     double usernum{}; //user input 
     while (1) {
-        cout << "\n\nPlease enter a target SER (%): \n Tip: If you aim to work 50 minutes w/ 10 minute breaks in between, your target SER is (50/60 = 83%) " << endl; 
+        cout << "\n\nPlease enter a target SER (%): \n Tips/Presets: \n -> Classic Pomodoro 50/10 or 25/5: 83.33% SER \n -> Deep Study 90/10: 90.00% SER" << endl; 
         cin >> usernum; 
         if (usernum<=0 || usernum > 100) {
             cout << "Please input a value between {0, 100}." << endl; 
@@ -80,7 +78,13 @@ int main() {
 
     using clock = std::chrono::steady_clock; 
     auto startTime = clock::now(); //time of program beginning
+
     auto elapsedTime{clock::duration::zero()}; //total elapsed time 
+    int elapsed_s{}; //TOTAL elapsed seconds
+    int seconds{}; //elapsed seconds
+    int minutes{}; //elapsed minutes
+    int hours{}; //elapsed hours
+
     auto tempBreakStart{clock::now()}; //temporary break start time
     auto tempBreakElapsed{clock::duration::zero()}; //temporary elapsed break time 
     auto totalPassive{clock::duration::zero()}; //total amount of time spent on break
@@ -144,8 +148,12 @@ int main() {
    
         //calculate elapsed time 
         elapsedTime = clock::now() - startTime; 
-        int elapsed_s;
         elapsed_s = std::chrono::duration_cast<std::chrono::seconds>(elapsedTime).count(); //convert to seconds 
+        seconds = elapsed_s; 
+        minutes = seconds/60; 
+        hours = minutes/60;
+        minutes = minutes%60; 
+        seconds = seconds%60; 
 
         if (mode == 0) { //if passive mode 
             tempBreakElapsed = clock::now() - tempBreakStart; //calculate the break time elapsed 
@@ -163,15 +171,15 @@ int main() {
         int totalPassive_s;
         totalPassive_s = std::chrono::duration_cast<std::chrono::seconds>(totalPassive).count();
 
-        if (elapsed_s > 0) { //if time passed is greater than 0 (division by 0 check)
+        if (seconds > 0) { //if time passed is greater than 0 (division by 0 check)
             ser = (((double)elapsed_s - (double)(tempBreakElapsed_s + totalPassive_s)) / ((double)elapsed_s)); //SER = elapsed time - (total elapsed break time + current break time (if there is any)) / total elapsed time
         } else ser = 1.00; 
         
         //delta calculations
-        delta = (((ser*100)-target))/target * 100; //delta equal the difference between target ser and actual ser 
+        delta = (((ser*100)-target)); //delta equal the difference between target ser and actual ser 
 
         //print data 
-        mvwprintw(data, 1, 0, "Elapsed Time: %f", (double)elapsed_s);
+        mvwprintw(data, 1, 0, "%d hrs, %d mins, and %d sec", hours, minutes, seconds);
         mvwprintw(data, 2, 0, "SER: %.2f%%", ser*100);
         int deltaState; 
         if (delta<0) { 
@@ -230,7 +238,7 @@ int main() {
     
     clear(); 
     printw("SESSION CONCLUDED ------------------%%%%%%% \n"); 
-    printw("Concluding SER & Delta: %.2f%% %c%.2f%", ser, deltaSign, fabs(delta)); 
+    printw("Concluding SER & Delta: %.2f%% %c%.2f%", ser, deltaSign, fabs(delta)*100); 
     printw("\nRecord in log file? [Y]");
     userc = getch(); 
     if (userc =='Y' || userc == 'y') {
@@ -246,7 +254,7 @@ int main() {
         if (!log) {
             printw("Error in file append. Logs not recorded. Double check integrity of file.");
         }
-        log << std::put_time(std::localtime(&now_c), "%Y-%m-%d %H:%M")
+        log << fixed << setprecision(2) << std::put_time(std::localtime(&now_c), "%Y-%m-%d %H:%M")
         << " | duration: " << hours << "hrs " << minutes << "min " << seconds << "sec"
         << " | SER: " << ser *100 << "%\n";
         clear(); 
