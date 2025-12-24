@@ -8,7 +8,7 @@ SER, or Study/Session Efficiency Ratio, is defined as _active working time / tot
 
 # Author 
 
-Daniel Song
+Ideated and Designed by Daniel Song ->
 Designed as an honest solution to a required accurate encouragement to work efficiently and manage breaks, without bloated statistics. 
 
 
