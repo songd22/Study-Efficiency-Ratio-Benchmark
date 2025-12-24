@@ -6,7 +6,7 @@ A simple as-you-go benchmark to encourage efficiency and consistent breaktime. A
 
 SER, or Study/Session Efficiency Ratio, is defined as _active working time / total elapsed time_. When you take a break, your SER will decrease. Consistent working results in an increase or recovery of SER. The user sets a goal for the session and a simple delta is calculated to indicate improvement or regression. 
 
-#Author 
+# Author 
 
 Daniel Song
 Designed as an honest solution to a required accurate encouragement to work efficiently and manage breaks, without bloated statistics. 
