@@ -1,6 +1,6 @@
 # Study Efficiency Ratio Benchmark
 
-A simple as-you-go benchmark to encourage efficiency and consistent breaktime. A terminal-based productivity tool that provides active feedback about work efficiency over time. Designed for accurate feedback without bloat or gamefication. Instead of displaying statistics at the end of a work session, statistics will be displayed **as one studies, *** of which can be used to encourage productivity or provide insight into work habits. 
+A simple as-you-go benchmark to encourage efficiency and consistent breaktime. A terminal-based productivity tool that provides active feedback about work efficiency over time. Designed for accurate feedback without bloat or gamefication. Instead of displaying statistics at the end of a work session, statistics will be displayed **as one studies,** of which this information can be used to encourage productivity or provide insight into work habits. 
 
 # Core Concept
 
