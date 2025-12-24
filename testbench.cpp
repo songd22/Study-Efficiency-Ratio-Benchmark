@@ -5,6 +5,8 @@
 #include <fstream>
 #include <iomanip>
 #include <ctime>
+#include <cstdlib>
+#include <filesystem>
 using namespace std; 
 
 const string VERSION = "1.0"; 
@@ -234,7 +236,7 @@ int main() {
     
     clear(); 
     printw("SESSION CONCLUDED ------------------%%%%%%% \n"); 
-    printw("Concluding SER & Delta: %.2f%% %c%.2f%", ser*100, deltaSign, fabs(delta)); 
+    printw("Concluding SER & Delta: %.2f%% %c%.2f%%", ser*100, deltaSign, fabs(delta)); 
     printw("\nRecord in log file? [Y]");
     userc = getch(); 
     if (userc =='Y' || userc == 'y') {
