@@ -21,7 +21,7 @@ int main() {
 
     double usernum{}; //user input 
     while (1) {
-        cout << "\n\nPlease enter a target SER (%): \n Tips/Presets: \n -> Classic Pomodoro 50/10 or 25/5: 83.33% SER \n -> Deep Study 90/10: 90.00% SER" << endl; 
+        cout << "\n\nPlease enter a target SER (%): \n Tips/Presets: \n -> Classic Pomodoro 50/10 or 25/5: 83.33% SER \n -> Deep Study 90/10: 90.00% SER \n -> Light Study 70/30: 70.00% SER" << endl; 
         cin >> usernum; 
         if (usernum<=0 || usernum > 100) {
             cout << "Please input a value between {0, 100}." << endl; 
@@ -252,9 +252,19 @@ int main() {
         if (!log) {
             printw("Error in file append. Logs not recorded. Double check integrity of file.");
         }
+
+        //blocking input 
+        wtimeout(interface, -1);   
+        echo();
+        nocbreak();
+        
+        printw("\nPlease enter a note or title for this log: "); 
+        char* userstr = new char[50]; 
+        getstr(userstr); 
+
         log << fixed << setprecision(2) << std::put_time(std::localtime(&now_c), "%Y-%m-%d %H:%M")
         << " | duration: " << hours << "hrs " << minutes << "min " << seconds << "sec"
-        << " | SER: " << ser *100 << "%\n";
+        << " | SER: " << ser *100 << "% | \"" << userstr << "\""; 
         clear(); 
         printw("\nWrite success.\n");
         log.close(); 
