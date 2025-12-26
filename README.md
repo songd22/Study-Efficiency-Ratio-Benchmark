@@ -10,5 +10,14 @@ SER, or Study/Session Efficiency Ratio, is defined as _active working time / tot
 
 Ideated and Designed by Daniel Song -> designed as an honest solution to a need for an accurate encouragement to work efficiently and manage breaks, without bloated statistics. 
 
+# Version History
 
+- December 2025 V1.0 - Basic ver. released with essential features! SER Benchmark is on the move! 
+- December 2025 V1.1 - Added one more preset for you: "Light study" & Added the ability to add notes/titles to your logs! Organization galore! 
+
+# Roadmap
+- More statistical displays!
+- More log organization tools?
+
+_Direct any suggestions to daniel.song1909@gmail.com | They are very welcome and almost certainly will be implemented!_
 
