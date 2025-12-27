@@ -16,6 +16,7 @@ Happy working!
 #include <cstdlib>
 #include <filesystem>
 #include <string> 
+
 using namespace std; 
 
 const char* VERSION = "1.2"; 
@@ -67,6 +68,7 @@ int main() {
     bool flashOn = 1; //stores whether or not the line is currently on or off 
 
     while(1) {
+        //blocking input 
         nocbreak();
         echo(); 
         
