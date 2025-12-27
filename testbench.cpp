@@ -86,7 +86,7 @@ int main() {
         refresh();
 
         while (1) {
-            mvwprintw(stdscr, 5, 0, "Select a preset TARGET SER:(Tip: What is your intention for this study session?): \n\n [1] Classic Pomodoro 83.33%% (25/5 or 50/10) \n [2] Deep Study 90%% (90/10) \n [3] Light Study 70%% \n [4] Lolligagging 25%% \n [5] Custom");
+            mvwprintw(stdscr, 5, 0, "Select a preset TARGET SER: (Tip: What is your intention for this work session?): \n\n [1] Classic Pomodoro 83.33%% (25/5 or 50/10) \n [2] Deep Work 90%% (90/10) \n [3] Light Work 70%% \n [4] Lolligagging 25%% \n [5] Custom");
             mvwprintw(stdscr, 13, 0, "Press X to quit the program."); 
             move(14, 0); 
             userch = getch();
