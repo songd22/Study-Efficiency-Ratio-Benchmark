@@ -13,7 +13,8 @@ Ideated and Designed by Daniel Song -> designed as an honest solution to a need 
 # Version History
 
 - December 2025 V1.0 - Basic ver. released with essential features! SER Benchmark is on the move! 
-- December 2025 V1.1 - Added one more preset for you: "Light study" & Added the ability to add notes/titles to your logs! Organization galore! 
+- December 2025 V1.1 - Added one more preset for you: "Light study" & Added the ability to add notes/titles to your logs! Organization galore!
+- December 2025 V1.2 - Massive code refactor, many QoL changes!
 
 # Roadmap
 - More statistical displays!
