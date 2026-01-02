@@ -17,12 +17,19 @@ Happy working!
 #include <filesystem>
 #include <string> 
 
+#include <unistd.h> //file opening
+#include <mach-o/dyld.h>
+#include <signal.h>
+
 using namespace std; 
 
 const char* VERSION = "1.2"; 
 
-int main() {
+void open_log(std::string);
+std::string get_path();
 
+int main() {
+    signal(SIGCHLD, SIG_IGN);  //remove child copies automatically
     initscr(); //PROGRAM START
 
     //input variables 
@@ -87,7 +94,7 @@ int main() {
 
         while (1) {
             mvwprintw(stdscr, 5, 0, "Select a preset TARGET SER: (Tip: What is your intention for this work session?): \n\n [1] Classic Pomodoro 83.33%% (25/5 or 50/10) \n [2] Deep Work 90%% (90/10) \n [3] Light Work 70%% \n [4] Lolligagging 25%% \n [5] Custom");
-            mvwprintw(stdscr, 13, 0, "Press X to quit the program."); 
+            mvwprintw(stdscr, 13, 0, "Press X to quit the program, or L to open log file in your preferred application (Mac Exclusive)."); 
             move(14, 0); 
             userch = getch();
             if (userch == '1') {
@@ -119,7 +126,9 @@ int main() {
                 getch(); 
                 endwin();
                 return 0; 
-            } 
+            }  else if (userch == 'L') {
+                open_log(get_path()); 
+            }
         }
         userch = 0; //clear user input 
 
@@ -135,7 +144,7 @@ int main() {
         wprintw(interface, "SER BENCHMARK // TARGET %.2f%%", target); 
         wmove(interface, 2, 0); 
         wprintw(interface, "----------------------------------------"); 
-        wprintw(interface, "[S] Begin Program [X] Return to Menu"); 
+        wprintw(interface, "[S] Begin Session [X] Return to Menu"); 
         wrefresh(interface); 
 
         while(userch!='S' && userch!='s' && userch!='X') { //input logic 
@@ -282,7 +291,7 @@ int main() {
         clear(); 
         printw("SESSION CONCLUDED ------------------%%%%%%% \n"); 
         printw("Concluding SER & Delta: %.2f%% %c%.2f%%", ser*100, deltaSign, fabs(delta)); 
-        printw("\nRecord in log file? [Y]");
+        printw("\nRecord in log file? [Y] (Mac Exclusive)");
         userch = getch(); 
         if (userch =='Y' || userch == 'y') {
 
@@ -293,7 +302,7 @@ int main() {
             minutes = minutes%60; 
             seconds = seconds%60; 
 
-            std::ofstream log("log.txt", std::ios::app);
+            std::ofstream log(get_path(), std::ios::app);
             if (!log) {
                 printw("Error in file append. Logs not recorded. Double check integrity of file.");
             }
@@ -312,10 +321,29 @@ int main() {
             clear(); 
             printw("\nWrite success.\n");
             log.close(); 
+            open_log(get_path()); 
+            
         } else { 
             printw("\nAcknowledged. Logs not recorded.\n");
         }
         printw("\n\nEnter any key to return to the menu\n"); ////WORK FROM HERE 
         getch(); 
+    }
+}
+
+std::string get_path() {
+    char path[1024]; 
+    uint32_t size = sizeof(path);
+    _NSGetExecutablePath(path, &size);
+    char* end = strrchr(path, '/');
+    strcpy(end + 1, "log.txt");
+    return std::string(path); 
+}
+
+void open_log(std::string path) { //ONLY MAC COMPATIBLE 
+    pid_t pid = fork(); //create another instance 
+    if (pid == 0) { //if child 
+        execlp("open", "open", path.c_str(), (char*)nullptr); //replace child w new program
+        _exit(1);
     }
 }
