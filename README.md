@@ -20,6 +20,7 @@ Ideated and Designed by Daniel Song -> designed as an honest solution to a need 
 # Roadmap
 - More statistical displays!
 - More log organization tools?
+- Universal compatibility? (Only if someone else uses the app on a different platform, haha) 
 
 _Direct any suggestions to daniel.song1909@gmail.com | They are very welcome and almost certainly will be implemented!_
 
