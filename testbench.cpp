@@ -23,7 +23,7 @@ Happy working!
 
 using namespace std; 
 
-const char* VERSION = "1.2"; 
+const char* VERSION = "1.3"; 
 
 void open_log(std::string);
 std::string get_path();
