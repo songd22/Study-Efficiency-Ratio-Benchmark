@@ -15,10 +15,12 @@ Ideated and Designed by Daniel Song -> designed as an honest solution to a need 
 - December 2025 V1.0 - Basic ver. released with essential features! SER Benchmark is on the move! 
 - December 2025 V1.1 - Added one more preset for you: "Light study" & Added the ability to add notes/titles to your logs! Organization galore!
 - December 2025 V1.2 - Massive code refactor, many QoL changes!
+- January 2026 V1.3 - Reconfigured log files, added the ability to view logs from the menu
 
 # Roadmap
 - More statistical displays!
 - More log organization tools?
+- Universal compatibility? (Only if someone else uses the app on a different platform, haha) 
 
 _Direct any suggestions to daniel.song1909@gmail.com | They are very welcome and almost certainly will be implemented!_
 
