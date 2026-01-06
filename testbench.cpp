@@ -153,7 +153,13 @@ int main() {
         if (userch == 'X') {
                 continue; //return to menu
         }
-        userch = 0; //clear user input 
+        
+        startTime = clock::now(); // Reset start time for new session
+        elapsedTime = clock::duration::zero(); // Reset elapsed time
+        totalPassive = clock::duration::zero(); // Reset passive time
+        tempBreakElapsed = clock::duration::zero(); // Reset temp break time
+        mode = 1; // Reset to active mode
+        userch = 0; //clear user input
 
         wrefresh(display); 
 
