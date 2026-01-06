@@ -16,7 +16,8 @@ Ideated and Designed by Daniel Song -> designed as an honest solution to a need 
 - December 2025 V1.1 - Added one more preset for you: "Light study" & Added the ability to add notes/titles to your logs! Organization galore!
 - December 2025 V1.2 - Massive code refactor, many QoL changes!
 - January 2026 V1.3 - Reconfigured log files, added the ability to view logs from the menu
--   V1.31 - critical bug fix
+- January 2026 V1.31 - critical bug fix
+
 
 # Roadmap
 - More statistical displays!
